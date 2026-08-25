@@ -1,88 +1,53 @@
-import { useEffect, useState } from "react";
-import SearchForm from "../components/movies/SearchForm";
+import { useMovies } from "../hooks/useMovies";
 import MovieGrid from "../components/movies/MovieGrid";
-import {
-  getPopularMovies,
-  searchMovies,
-} from "../services/tmdbApi";
-import type { Movie } from "../types/movie";
+import SearchForm from "../components/movies/SearchForm";
+import MovieFilters from "../components/movies/MovieFilters";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorMessage from "../components/common/ErrorMessage";
 
 function MoviesPage() {
-  // The initial request begins when the page opens,
-  // so loading starts as true.
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let ignoreResult = false;
-
-    // There are no synchronous state updates here.
-    getPopularMovies()
-      .then((results) => {
-        if (!ignoreResult) {
-          setMovies(results);
-        }
-      })
-      .catch((requestError) => {
-        console.error(requestError);
-
-        if (!ignoreResult) {
-          setError("Failed to load popular movies.");
-        }
-      })
-      .finally(() => {
-        if (!ignoreResult) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      ignoreResult = true;
-    };
-  }, []);
-
-  async function handleSearch(searchTerm: string) {
-    // This function runs because of a user event,
-    // so synchronous state updates are appropriate here.
-    setLoading(true);
-    setError("");
-
-    try {
-      const results = searchTerm
-        ? await searchMovies(searchTerm)
-        : await getPopularMovies();
-
-      setMovies(results);
-    } catch (requestError) {
-      console.error(requestError);
-      setMovies([]);
-      setError("Failed to load movies.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const {
+    movies,
+    loading,
+    error,
+    page,
+    totalPages,
+    setPage,
+    search,
+    filterByGenre,
+  } = useMovies();
 
   return (
-    <>
-      <SearchForm onSearch={handleSearch} />
+    <div>
+      <h1>Movies</h1>
 
-      {loading && (
-        <p className="text-center">Loading movies...</p>
-      )}
+      <SearchForm onSearch={search} />
 
-      {error && (
-        <p className="text-center text-danger">{error}</p>
-      )}
+      <MovieFilters onFilterChange={filterByGenre} />
 
-      {!loading && !error && movies.length === 0 && (
-        <p className="text-center">No movies were found.</p>
-      )}
+      {(() => {
+        if (loading) return <LoadingSpinner />;
+        else if (error) return <ErrorMessage message={error} />;
+        return <MovieGrid movies={movies} />;
+      })()}
 
-      {!loading && !error && movies.length > 0 && (
-        <MovieGrid movies={movies} />
-      )}
-    </>
+      <div>
+        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+          Previous
+        </button>
+
+        <span>
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    </div>
   );
 }
 

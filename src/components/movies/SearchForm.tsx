@@ -1,64 +1,44 @@
 import { useState, type FormEvent } from "react";
 
 interface SearchFormProps {
-  onSearch: (searchTerm: string) => void;
+  onSearch: (query: string) => void;
 }
 
 function SearchForm({ onSearch }: SearchFormProps) {
-  const [input, setInput] = useState("");
-  const [validationError, setValidationError] = useState("");
+  const [input, setInput] = useState<string>("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    const trimmedInput = input.trim();
+    const trimmed = input.trim();
 
-    if (!trimmedInput) {
-      setValidationError("Enter a movie title.");
+    if (trimmed === "") {
+      setValidationError("Please enter a search term.");
       return;
     }
 
-    setValidationError("");
-    onSearch(trimmedInput);
-  }
-
-  function handleReset() {
-    setInput("");
-    setValidationError("");
-    onSearch("");
-  }
+    setValidationError(null);
+    onSearch(trimmed);
+  };
 
   return (
-    <section className="container my-4">
-      <form
-        className="d-flex flex-column flex-sm-row gap-2"
-        onSubmit={handleSubmit}
-      >
-        <input
-          className="form-control"
-          type="text"
-          placeholder="Search movies..."
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-        />
-
-        <button className="btn btn-primary" type="submit">
-          Search
-        </button>
-
-        <button
-          className="btn btn-secondary"
-          type="button"
-          onClick={handleReset}
-        >
-          All
-        </button>
-      </form>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Search movies..."
+        aria-label="Search movies"
+      />
+      <button type="submit">Search</button>
 
       {validationError && (
-        <p className="text-danger mt-2">{validationError}</p>
+        <div role="alert" style={{ color: "red" }}>
+          {validationError}
+        </div>
       )}
-    </section>
+    </form>
   );
 }
 
