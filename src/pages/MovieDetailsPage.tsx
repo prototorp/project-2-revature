@@ -24,12 +24,12 @@ function getUSCertification(
   }
 
   const preferredReleaseTypes = [
-    3, // Theatrical
-    2, // Limited theatrical
-    4, // Digital
-    5, // Physical
-    6, // TV
-    1, // Premiere
+    3,
+    2,
+    4,
+    5,
+    6,
+    1,
   ];
 
   for (const releaseType of preferredReleaseTypes) {
@@ -101,8 +101,7 @@ function MovieDetailsPage() {
           setDetailsState({
             requestedId: movieId,
             movie: null,
-            error:
-              "Failed to load movie details.",
+            error: "Failed to load movie details.",
           });
         }
       });
@@ -150,10 +149,10 @@ function MovieDetailsPage() {
   return (
     <section className="container my-4">
       <Link
-        className="btn btn-secondary mb-3"
+        className="btn btn-outline-primary mb-3"
         to="/movies"
       >
-        Back to movies
+        ← Back to Movies
       </Link>
 
       <div className="card">
@@ -200,7 +199,7 @@ function MovieDetailsPage() {
                   Runtime: {movie.runtime} minutes
                 </p>
               )}
-              
+
               <p>
                 Content Rating:{" "}
                 <span className="badge bg-secondary">

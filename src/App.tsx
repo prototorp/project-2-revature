@@ -1,61 +1,35 @@
-import {
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
-
-import ProtectedRoute from "./components/common/ProtectedRoute";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
-
-import AboutPage from "./pages/AboutPage";
-import FavoritesPage from "./pages/FavoritesPage";
-import LoginPage from "./pages/LoginPage";
-import MovieDetailsPage from "./pages/MovieDetailsPage";
 import MoviesPage from "./pages/MoviesPage";
-import NotFoundPage from "./pages/NotFoundPage";
+import MovieDetailsPage from "./pages/MovieDetailsPage";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route
-          index
-          element={
-            <Navigate to="/movies" replace />
-          }
-        />
+      {/* Public */}
+      <Route path="/login" element={<LoginPage />} />
 
-        <Route
-          path="/login"
-          element={<LoginPage />}
-        />
+      {/* Opening "/" → Login */}
+      <Route
+        index
+        element={<Navigate to="/login" replace />}
+      />
 
-        <Route
-          path="/movies"
-          element={<MoviesPage />}
-        />
-
-        <Route
-          path="/movies/:movieId"
-          element={<MovieDetailsPage />}
-        />
-
-        <Route
-          path="/about"
-          element={<AboutPage />}
-        />
-
-        <Route element={<ProtectedRoute />}>
+      {/* Protected pages */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
           <Route
-            path="/favorites"
-            element={<FavoritesPage />}
+            path="/movies"
+            element={<MoviesPage />}
+          />
+
+          <Route
+            path="/movies/:movieId"
+            element={<MovieDetailsPage />}
           />
         </Route>
-
-        <Route
-          path="*"
-          element={<NotFoundPage />}
-        />
       </Route>
     </Routes>
   );

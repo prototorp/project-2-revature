@@ -1,148 +1,109 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
 import {
   Navigate,
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [error, setError] = useState("");
 
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const redirectPath =
-    (
-      location.state as {
-        from?: {
-          pathname?: string;
-        };
-      } | null
-    )?.from?.pathname ?? "/movies";
+    (location.state as { from?: { pathname?: string } } | null)
+      ?.from?.pathname ?? "/movies";
 
   if (isAuthenticated) {
     return <Navigate to="/movies" replace />;
   }
 
-  function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const nextErrors: FormErrors = {};
-    const trimmedEmail = email.trim();
-
-    if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
-      nextErrors.email =
-        "Enter a valid email address.";
-    }
-
-    if (password.length < 6) {
-      nextErrors.password =
-        "Password must contain at least 6 characters.";
-    }
-
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length > 0) {
+    if (!username.trim() || !password.trim()) {
+      setError("Username and password are required.");
       return;
     }
 
-    login(trimmedEmail);
+    setError("");
+
+    login();
 
     navigate(redirectPath, {
       replace: true,
+      state: {
+        message: "Login successful! Welcome!",
+      },
     });
   }
 
   return (
-    <section className="container py-5">
-      <div className="card mx-auto login-card">
-        <div className="card-body p-4">
-          <h1 className="h2 mb-3">Log in</h1>
+    <section className="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-dark">
+      <div
+        className="card shadow-lg border-0 rounded-4"
+        style={{ maxWidth: "420px", width: "100%" }}
+      >
+        <div className="card-body p-5">
+          <h1 className="text-center fw-bold mb-2">
+            🎬 MovieDB
+          </h1>
 
-          <p className="text-body-secondary mb-4">
-            Use any valid email and a password with
-            at least six characters.
+          <p className="text-center text-muted mb-4">
+            Sign in to continue
           </p>
 
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="mb-3 text-start">
-              <label
-                className="form-label"
-                htmlFor="email"
-              >
-                Email
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="username" className="form-label">
+                Username
               </label>
 
               <input
-                className={
-                  `form-control${
-                    errors.email ? " is-invalid" : ""
-                  }`
-                }
-                id="email"
-                type="email"
-                value={email}
+                id="username"
+                type="text"
+                className="form-control form-control-lg"
+                value={username}
                 onChange={(event) =>
-                  setEmail(event.target.value)
+                  setUsername(event.target.value)
                 }
-                autoComplete="email"
+                placeholder="Enter username"
               />
-
-              {errors.email && (
-                <div className="invalid-feedback">
-                  {errors.email}
-                </div>
-              )}
             </div>
 
-            <div className="mb-4 text-start">
-              <label
-                className="form-label"
-                htmlFor="password"
-              >
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
                 Password
               </label>
 
               <input
-                className={
-                  `form-control${
-                    errors.password
-                      ? " is-invalid"
-                      : ""
-                  }`
-                }
                 id="password"
                 type="password"
+                className="form-control form-control-lg"
                 value={password}
                 onChange={(event) =>
                   setPassword(event.target.value)
                 }
-                autoComplete="current-password"
+                placeholder="Enter password"
               />
-
-              {errors.password && (
-                <div className="invalid-feedback">
-                  {errors.password}
-                </div>
-              )}
             </div>
 
+            {error && (
+              <p className="text-danger text-center">
+                {error}
+              </p>
+            )}
+
             <button
-              className="btn btn-primary w-100"
               type="submit"
+              className="btn btn-primary btn-lg w-100 mt-2"
             >
-              Log in
+              Login
             </button>
           </form>
         </div>

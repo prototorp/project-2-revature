@@ -1,22 +1,8 @@
-import {
-  NavLink,
-  useNavigate,
-} from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function Header() {
-  const {
-    user,
-    isAuthenticated,
-    logout,
-  } = useAuth();
-
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    logout();
-    navigate("/login");
-  }
+  const { logout } = useAuth();
 
   const linkClass = ({
     isActive,
@@ -44,42 +30,13 @@ function Header() {
               Movies
             </NavLink>
 
-            <NavLink
-              className={linkClass}
-              to="/favorites"
+            <button
+              className="btn btn-outline-light btn-sm"
+              type="button"
+              onClick={logout}
             >
-              Favorites
-            </NavLink>
-
-            <NavLink
-              className={linkClass}
-              to="/about"
-            >
-              About
-            </NavLink>
-
-            {isAuthenticated ? (
-              <>
-                <span className="navbar-text small">
-                  {user?.email}
-                </span>
-
-                <button
-                  className="btn btn-outline-light btn-sm"
-                  type="button"
-                  onClick={handleLogout}
-                >
-                  Log out
-                </button>
-              </>
-            ) : (
-              <NavLink
-                className="btn btn-outline-light btn-sm"
-                to="/login"
-              >
-                Log in
-              </NavLink>
-            )}
+              Logout
+            </button>
           </div>
         </div>
       </nav>

@@ -3,7 +3,7 @@ import {
   Outlet,
   useLocation,
 } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/AuthContext";
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAuth();
