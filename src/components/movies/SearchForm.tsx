@@ -1,14 +1,20 @@
-import { useState, type FormEvent } from "react";
-
+import { useState, type SyntheticEvent } from "react";
 interface SearchFormProps {
   onSearch: (searchTerm: string) => void;
+  genres: { id: number; name: string }[];
+  selectedGenre: string;
+  onGenreChange: (genreId: string) => void;
 }
 
-function SearchForm({ onSearch }: SearchFormProps) {
+function SearchForm({ onSearch,
+  genres,
+  selectedGenre,
+  onGenreChange,
+ }: SearchFormProps) {
   const [input, setInput] = useState("");
   const [validationError, setValidationError] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const trimmedInput = input.trim();
@@ -46,6 +52,20 @@ function SearchForm({ onSearch }: SearchFormProps) {
           Search
         </button>
 
+        <select
+          className="form-select"
+          value={selectedGenre}
+          onChange={(event) => onGenreChange(event.target.value)}
+        >
+          <option value="">All Genres</option>
+
+          {genres.map((genre) => (
+            <option key={genre.id} value={genre.id}>
+              {genre.name}
+            </option>
+          ))}
+        </select>
+
         <button
           className="btn btn-secondary"
           type="button"
@@ -55,9 +75,7 @@ function SearchForm({ onSearch }: SearchFormProps) {
         </button>
       </form>
 
-      {validationError && (
-        <p className="text-danger mt-2">{validationError}</p>
-      )}
+      {validationError && <p className="text-danger mt-2">{validationError}</p>}
     </section>
   );
 }

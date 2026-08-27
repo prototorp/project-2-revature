@@ -5,6 +5,7 @@ import type {
 } from "../types/movie";
 
 const API_URL = "https://api.themoviedb.org/3";
+
 const token = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN;
 
 async function requestTMDB<T>(endpoint: string): Promise<T> {

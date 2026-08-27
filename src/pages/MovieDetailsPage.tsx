@@ -64,8 +64,8 @@ function MovieDetailsPage() {
 
   return (
     <section className="container my-4">
-      <Link className="btn btn-secondary mb-3" to="/movies">
-        Back to movies
+      <Link className="btn btn-outline-primary mb-3" to="/movies">
+        ← Back to Movies
       </Link>
 
       <div className="card">
@@ -84,9 +84,7 @@ function MovieDetailsPage() {
             <div className="card-body">
               <h1 className="card-title">{movie.title}</h1>
 
-              {movie.tagline && (
-                <p className="fst-italic">{movie.tagline}</p>
-              )}
+              {movie.tagline && <p className="fst-italic">{movie.tagline}</p>}
 
               <p>{movie.overview}</p>
               <p>Rating: ⭐ {movie.vote_average.toFixed(1)}</p>
@@ -98,10 +96,7 @@ function MovieDetailsPage() {
 
               <div>
                 {movie.genres.map((genre) => (
-                  <span
-                    className="badge bg-secondary me-2"
-                    key={genre.id}
-                  >
+                  <span className="badge bg-secondary me-2" key={genre.id}>
                     {genre.name}
                   </span>
                 ))}

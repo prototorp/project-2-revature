@@ -2,24 +2,44 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import MoviesPage from "./pages/MoviesPage";
 import MovieDetailsPage from "./pages/MovieDetailsPage";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
-  return (
+    return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<Navigate to="/movies" replace />} />
 
-        <Route path="/movies" element={<MoviesPage />} />
+      {/* Public */}
+      <Route path="/login" element={<LoginPage />} />
 
-        <Route
-          path="/movies/:movieId"
-          element={<MovieDetailsPage />}
-        />
+      {/* Opening "/" → Login */}
+      <Route
+        index
+        element={<Navigate to="/login" replace />}
+      />
 
-        <Route path="*" element={<Navigate to="/movies" replace />} />
+      {/* Protected pages */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+
+          {/* Movies */}
+          <Route
+            path="/movies"
+            element={<MoviesPage />}
+          />
+
+          {/* Movie Details */}
+          <Route
+            path="/movies/:movieId"
+            element={<MovieDetailsPage />}
+          />
+
+        </Route>
       </Route>
+
     </Routes>
   );
+
 }
 
 export default App;

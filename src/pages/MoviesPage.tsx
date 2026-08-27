@@ -1,23 +1,28 @@
+import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SearchForm from "../components/movies/SearchForm";
 import MovieGrid from "../components/movies/MovieGrid";
-import {
-  getPopularMovies,
-  searchMovies,
-} from "../services/tmdbApi";
+import { getPopularMovies, searchMovies } from "../services/tmdbApi";
 import type { Movie } from "../types/movie";
+import { genres } from "../constants/genres";
 
 function MoviesPage() {
-  // The initial request begins when the page opens,
-  // so loading starts as true.
+  // Login success message
+  const location = useLocation();
+  const message = location.state?.message;
+
+  // Movie data and UI state
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Selected genre for filtering
+  const [selectedGenre, setSelectedGenre] = useState("");
+
   useEffect(() => {
     let ignoreResult = false;
 
-    // There are no synchronous state updates here.
+    // Load popular movies when the page opens
     getPopularMovies()
       .then((results) => {
         if (!ignoreResult) {
@@ -43,8 +48,6 @@ function MoviesPage() {
   }, []);
 
   async function handleSearch(searchTerm: string) {
-    // This function runs because of a user event,
-    // so synchronous state updates are appropriate here.
     setLoading(true);
     setError("");
 
@@ -63,9 +66,27 @@ function MoviesPage() {
     }
   }
 
+  // Filter movies by selected genre
+  const filteredMovies = selectedGenre
+    ? movies.filter((movie) =>
+        movie.genre_ids?.includes(Number(selectedGenre))
+      )
+    : movies;
+
   return (
     <>
-      <SearchForm onSearch={handleSearch} />
+      {message && (
+        <div className="alert alert-success text-center" role="alert">
+          ✅ {message}
+        </div>
+      )}
+
+      <SearchForm
+        onSearch={handleSearch}
+        genres={genres}
+        selectedGenre={selectedGenre}
+        onGenreChange={setSelectedGenre}
+      />
 
       {loading && (
         <p className="text-center">Loading movies...</p>
@@ -75,12 +96,12 @@ function MoviesPage() {
         <p className="text-center text-danger">{error}</p>
       )}
 
-      {!loading && !error && movies.length === 0 && (
+      {!loading && !error && filteredMovies.length === 0 && (
         <p className="text-center">No movies were found.</p>
       )}
 
-      {!loading && !error && movies.length > 0 && (
-        <MovieGrid movies={movies} />
+      {!loading && !error && filteredMovies.length > 0 && (
+        <MovieGrid movies={filteredMovies} />
       )}
     </>
   );

@@ -1,6 +1,8 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function Header() {
+  const { logout } = useAuth();
   return (
     <header>
       <nav className="navbar navbar-dark bg-dark">
@@ -23,6 +25,11 @@ function Header() {
             <NavLink className="nav-link" to="/about">
               About
             </NavLink> */}
+
+            <button className="btn btn-outline-light btn-sm" onClick={logout}>
+              Logout
+            </button>
+            
           </div>
         </div>
       </nav>
