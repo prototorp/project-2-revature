@@ -67,7 +67,12 @@ export async function getMoviesByGenre(
 export async function getMovieDetails(
   id: number,
 ): Promise<MovieDetails> {
-  return requestTMDB<MovieDetails>(`/movie/${id}`);
+  return requestTMDB<MovieDetails>(
+    `/movie/${id}`,
+    {
+      append_to_response: "release_dates",
+    },
+  );
 }
 
 interface GenreResponse {

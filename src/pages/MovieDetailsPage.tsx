@@ -11,6 +11,42 @@ import {
 import { getMovieDetails } from "../services/tmdbApi";
 import type { MovieDetails } from "../types/movie";
 
+function getUSCertification(
+  movie: MovieDetails,
+): string {
+  const usReleaseDates =
+    movie.release_dates.results.find(
+      (country) => country.iso_3166_1 === "US",
+    );
+
+  if (!usReleaseDates) {
+    return "Not rated";
+  }
+
+  const preferredReleaseTypes = [
+    3, // Theatrical
+    2, // Limited theatrical
+    4, // Digital
+    5, // Physical
+    6, // TV
+    1, // Premiere
+  ];
+
+  for (const releaseType of preferredReleaseTypes) {
+    const release = usReleaseDates.release_dates.find(
+      (item) =>
+        item.type === releaseType &&
+        item.certification !== "",
+    );
+
+    if (release) {
+      return release.certification;
+    }
+  }
+
+  return "Not rated";
+}
+
 function MovieDetailsPage() {
   const { movieId } = useParams();
 
@@ -109,6 +145,7 @@ function MovieDetailsPage() {
   }
 
   const movie = detailsState.movie;
+  const certification = getUSCertification(movie);
 
   return (
     <section className="container my-4">
@@ -163,6 +200,13 @@ function MovieDetailsPage() {
                   Runtime: {movie.runtime} minutes
                 </p>
               )}
+              
+              <p>
+                Content Rating:{" "}
+                <span className="badge bg-secondary">
+                  {certification}
+                </span>
+              </p>
 
               <div>
                 {movie.genres.map((genre) => (

@@ -17,6 +17,7 @@ export interface MovieDetails extends Movie {
   genres: Genre[];
   runtime: number | null;
   tagline: string;
+  release_dates: ReleaseDatesResponse;
 }
 
 export interface TMDBResponse {
@@ -24,4 +25,19 @@ export interface TMDBResponse {
   results: Movie[];
   total_pages: number;
   total_results: number;
+}
+
+export interface MovieReleaseDate {
+  certification: string;
+  release_date: string;
+  type: number;
+}
+
+export interface CountryReleaseDates {
+  iso_3166_1: string;
+  release_dates: MovieReleaseDate[];
+}
+
+export interface ReleaseDatesResponse {
+  results: CountryReleaseDates[];
 }
