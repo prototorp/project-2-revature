@@ -9,6 +9,10 @@ function Layout() {
       <main>
         <Outlet />
       </main>
+
+      <footer className="border-top py-3 mt-auto text-center text-body-secondary">
+        <small>MovieDB group project</small>
+      </footer>
     </>
   );
 }
