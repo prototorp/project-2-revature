@@ -1,4 +1,5 @@
 import { useState, type SyntheticEvent } from "react";
+
 interface SearchFormProps {
   onSearch: (searchTerm: string) => void;
   genres: { id: number; name: string }[];
@@ -6,11 +7,12 @@ interface SearchFormProps {
   onGenreChange: (genreId: string) => void;
 }
 
-function SearchForm({ onSearch,
+function SearchForm({
+  onSearch,
   genres,
   selectedGenre,
   onGenreChange,
- }: SearchFormProps) {
+}: SearchFormProps) {
   const [input, setInput] = useState("");
   const [validationError, setValidationError] = useState("");
 
@@ -75,7 +77,9 @@ function SearchForm({ onSearch,
         </button>
       </form>
 
-      {validationError && <p className="text-danger mt-2">{validationError}</p>}
+      {validationError && (
+        <p className="text-danger mt-2">{validationError}</p>
+      )}
     </section>
   );
 }

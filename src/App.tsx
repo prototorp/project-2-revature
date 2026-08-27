@@ -6,9 +6,8 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
-    return (
+  return (
     <Routes>
-
       {/* Public */}
       <Route path="/login" element={<LoginPage />} />
 
@@ -21,25 +20,19 @@ function App() {
       {/* Protected pages */}
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-
-          {/* Movies */}
           <Route
             path="/movies"
             element={<MoviesPage />}
           />
 
-          {/* Movie Details */}
           <Route
             path="/movies/:movieId"
             element={<MovieDetailsPage />}
           />
-
         </Route>
       </Route>
-
     </Routes>
   );
-
 }
 
 export default App;

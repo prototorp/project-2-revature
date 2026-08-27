@@ -2,7 +2,10 @@ import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SearchForm from "../components/movies/SearchForm";
 import MovieGrid from "../components/movies/MovieGrid";
-import { getPopularMovies, searchMovies } from "../services/tmdbApi";
+import {
+  getPopularMovies,
+  searchMovies,
+} from "../services/tmdbApi";
 import type { Movie } from "../types/movie";
 import { genres } from "../constants/genres";
 
@@ -76,7 +79,10 @@ function MoviesPage() {
   return (
     <>
       {message && (
-        <div className="alert alert-success text-center" role="alert">
+        <div
+          className="alert alert-success text-center"
+          role="alert"
+        >
           ✅ {message}
         </div>
       )}
@@ -89,20 +95,30 @@ function MoviesPage() {
       />
 
       {loading && (
-        <p className="text-center">Loading movies...</p>
+        <p className="text-center">
+          Loading movies...
+        </p>
       )}
 
       {error && (
-        <p className="text-center text-danger">{error}</p>
+        <p className="text-center text-danger">
+          {error}
+        </p>
       )}
 
-      {!loading && !error && filteredMovies.length === 0 && (
-        <p className="text-center">No movies were found.</p>
-      )}
+      {!loading &&
+        !error &&
+        filteredMovies.length === 0 && (
+          <p className="text-center">
+            No movies were found.
+          </p>
+        )}
 
-      {!loading && !error && filteredMovies.length > 0 && (
-        <MovieGrid movies={filteredMovies} />
-      )}
+      {!loading &&
+        !error &&
+        filteredMovies.length > 0 && (
+          <MovieGrid movies={filteredMovies} />
+        )}
     </>
   );
 }

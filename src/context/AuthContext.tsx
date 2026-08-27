@@ -17,33 +17,32 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const AuthProvider = ({ children }: AuthProviderProps) => {
+function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-  const saved = localStorage.getItem("isAuthenticated");
+    const saved = localStorage.getItem("isAuthenticated");
+    return saved === "true";
+  });
 
-  console.log("AuthContext localStorage:", saved);
+  function login() {
+    localStorage.setItem("isAuthenticated", "true");
+    setIsAuthenticated(true);
+  }
 
-  return saved === "true";
-});
-
-const login = () => {
-
-  localStorage.setItem("isAuthenticated", "true");
-  setIsAuthenticated(true);
-};
-  const logout = () => {
+  function logout() {
     localStorage.removeItem("isAuthenticated");
     setIsAuthenticated(false);
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-const useAuth = () => {
+function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
