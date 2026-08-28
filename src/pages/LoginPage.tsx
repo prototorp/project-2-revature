@@ -11,6 +11,10 @@ interface FormErrors {
   password?: string;
 }
 
+interface LoginLocationState {
+  from?: string;
+}
+
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,17 +24,19 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const locationState =
+    location.state as LoginLocationState | null;
+
   const redirectPath =
-    (
-      location.state as {
-        from?: {
-          pathname?: string;
-        };
-      } | null
-    )?.from?.pathname ?? "/movies";
+    locationState?.from ?? "/movies";
 
   if (isAuthenticated) {
-    return <Navigate to="/movies" replace />;
+    return (
+      <Navigate
+        to={redirectPath}
+        replace
+      />
+    );
   }
 
   function handleSubmit(
@@ -85,11 +91,9 @@ function LoginPage() {
               </label>
 
               <input
-                className={
-                  `form-control${
-                    errors.email ? " is-invalid" : ""
-                  }`
-                }
+                className={`form-control${
+                  errors.email ? " is-invalid" : ""
+                }`}
                 id="email"
                 type="email"
                 value={email}
@@ -115,13 +119,11 @@ function LoginPage() {
               </label>
 
               <input
-                className={
-                  `form-control${
-                    errors.password
-                      ? " is-invalid"
-                      : ""
-                  }`
-                }
+                className={`form-control${
+                  errors.password
+                    ? " is-invalid"
+                    : ""
+                }`}
                 id="password"
                 type="password"
                 value={password}

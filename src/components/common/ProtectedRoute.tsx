@@ -1,25 +1,21 @@
-import {
-  Navigate,
-  Outlet,
-  useLocation,
-} from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
-function ProtectedRoute() {
+export default function ProtectedRoute() {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
+    const returnTo = `${location.pathname}${location.search}${location.hash}`;
+
     return (
       <Navigate
         to="/login"
         replace
-        state={{ from: location }}
+        state={{ from: returnTo }}
       />
     );
   }
 
   return <Outlet />;
 }
-
-export default ProtectedRoute;
