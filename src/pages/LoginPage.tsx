@@ -6,6 +6,14 @@ import {
 } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+interface LoginLocationState {
+  from?:
+    | string
+    | {
+        pathname?: string;
+      };
+}
+
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,12 +23,23 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const locationState =
+    location.state as LoginLocationState | null;
+
+  const attemptedRoute = locationState?.from;
+
   const redirectPath =
-    (location.state as { from?: { pathname?: string } } | null)
-      ?.from?.pathname ?? "/movies";
+    typeof attemptedRoute === "string"
+      ? attemptedRoute
+      : attemptedRoute?.pathname ?? "/movies";
 
   if (isAuthenticated) {
-    return <Navigate to="/movies" replace />;
+    return (
+      <Navigate
+        to={redirectPath}
+        replace
+      />
+    );
   }
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {

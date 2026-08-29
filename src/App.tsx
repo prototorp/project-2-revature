@@ -4,6 +4,7 @@ import MoviesPage from "./pages/MoviesPage";
 import MovieDetailsPage from "./pages/MovieDetailsPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
         index
         element={<Navigate to="/login" replace />}
       />
+
+      <Route path="*" element={<NotFoundPage />} />
 
       {/* Protected pages */}
       <Route element={<ProtectedRoute />}>
