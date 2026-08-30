@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import SearchForm from "./SearchForm";
-// import '@testing-library/jest-dom/vitest';
 
 describe("SearchForm", () => {
   it("shows a validation error and does not call onSearch when input is empty", () => {

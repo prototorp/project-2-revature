@@ -1,158 +1,71 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
-import {
-  Link,
-  useParams,
-} from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { getMovieDetails } from "../services/tmdbApi";
 import type { MovieDetails } from "../types/movie";
 
-function getUSCertification(
-  movie: MovieDetails,
-): string {
-  const usReleaseDates =
-    movie.release_dates.results.find(
-      (country) => country.iso_3166_1 === "US",
-    );
-
-  if (!usReleaseDates) {
-    return "Not rated";
-  }
-
-  const preferredReleaseTypes = [
-    3,
-    2,
-    4,
-    5,
-    6,
-    1,
-  ];
-
-  for (const releaseType of preferredReleaseTypes) {
-    const release = usReleaseDates.release_dates.find(
-      (item) =>
-        item.type === releaseType &&
-        item.certification !== "",
-    );
-
-    if (release) {
-      return release.certification;
-    }
-  }
-
-  return "Not rated";
-}
-
 function MovieDetailsPage() {
   const { movieId } = useParams();
-
-  const [detailsState, setDetailsState] =
-    useState<{
-      requestedId: string | undefined;
-      movie: MovieDetails | null;
-      error: string;
-    }>({
-      requestedId: movieId,
-      movie: null,
-      error: "",
-    });
-
-  const numericMovieId = Number(movieId);
-
-  const invalidMovieId =
-    !movieId ||
-    !Number.isInteger(numericMovieId) ||
-    numericMovieId <= 0;
+  const [movie, setMovie] = useState<MovieDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!movieId) {
-      return;
-    }
-
-    const requestedMovieId = Number(movieId);
-
-    if (
-      !Number.isInteger(requestedMovieId) ||
-      requestedMovieId <= 0
-    ) {
-      return;
-    }
-
     let ignoreResult = false;
 
-    getMovieDetails(requestedMovieId)
-      .then((result) => {
+    async function loadMovieDetails() {
+      const numericMovieId = Number(movieId);
+
+      if (!movieId || Number.isNaN(numericMovieId)) {
+        setError("Invalid movie ID.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+
+      try {
+        const result = await getMovieDetails(numericMovieId);
+
         if (!ignoreResult) {
-          setDetailsState({
-            requestedId: movieId,
-            movie: result,
-            error: "",
-          });
+          setMovie(result);
         }
-      })
-      .catch((requestError: unknown) => {
+      } catch (requestError) {
         console.error(requestError);
 
         if (!ignoreResult) {
-          setDetailsState({
-            requestedId: movieId,
-            movie: null,
-            error: "Failed to load movie details.",
-          });
+          setError("Failed to load movie details.");
         }
-      });
+      } finally {
+        if (!ignoreResult) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadMovieDetails();
 
     return () => {
       ignoreResult = true;
     };
   }, [movieId]);
 
-  if (invalidMovieId) {
-    return (
-      <p className="text-center text-danger mt-4">
-        Invalid movie ID.
-      </p>
-    );
+  if (loading) {
+    return <p className="text-center mt-4">Loading movie details...</p>;
   }
 
-  if (detailsState.requestedId !== movieId) {
-    return (
-      <p className="text-center mt-4">
-        Loading movie details...
-      </p>
-    );
+  if (error) {
+    return <p className="text-center text-danger mt-4">{error}</p>;
   }
 
-  if (detailsState.error) {
-    return (
-      <p className="text-center text-danger mt-4">
-        {detailsState.error}
-      </p>
-    );
+  if (!movie) {
+    return <p className="text-center mt-4">Movie not found.</p>;
   }
-
-  if (!detailsState.movie) {
-    return (
-      <p className="text-center mt-4">
-        Loading movie details...
-      </p>
-    );
-  }
-
-  const movie = detailsState.movie;
-  const certification = getUSCertification(movie);
 
   return (
     <section className="container my-4">
-      <Link
-        className="btn btn-outline-primary mb-3"
-        to="/movies"
-      >
-        ← Back to Movies
+      <Link className="btn btn-secondary mb-3" to="/movies">
+        Back to movies
       </Link>
 
       <div className="card">
@@ -161,10 +74,7 @@ function MovieDetailsPage() {
             <div className="col-md-4">
               <img
                 className="img-fluid rounded-start"
-                src={
-                  `https://image.tmdb.org/t/p/w500` +
-                  movie.poster_path
-                }
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={`${movie.title} poster`}
               />
             </div>
@@ -172,40 +82,19 @@ function MovieDetailsPage() {
 
           <div className="col-md-8">
             <div className="card-body">
-              <h1 className="card-title">
-                {movie.title}
-              </h1>
+              <h1 className="card-title">{movie.title}</h1>
 
               {movie.tagline && (
-                <p className="fst-italic">
-                  {movie.tagline}
-                </p>
+                <p className="fst-italic">{movie.tagline}</p>
               )}
 
               <p>{movie.overview}</p>
-
-              <p>
-                Rating: ⭐{" "}
-                {movie.vote_average.toFixed(1)}
-              </p>
-
-              <p>
-                Release date:{" "}
-                {movie.release_date}
-              </p>
+              <p>Rating: ⭐ {movie.vote_average.toFixed(1)}</p>
+              <p>Release date: {movie.release_date}</p>
 
               {movie.runtime !== null && (
-                <p>
-                  Runtime: {movie.runtime} minutes
-                </p>
+                <p>Runtime: {movie.runtime} minutes</p>
               )}
-
-              <p>
-                Content Rating:{" "}
-                <span className="badge bg-secondary">
-                  {certification}
-                </span>
-              </p>
 
               <div>
                 {movie.genres.map((genre) => (

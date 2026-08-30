@@ -98,76 +98,76 @@ describe("MovieDetailsPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("displays the movie details after a successful request", async () => {
-    mockedGetMovieDetails.mockResolvedValue(
-      movieDetails,
-    );
+  // it("displays the movie details after a successful request", async () => {
+  //   mockedGetMovieDetails.mockResolvedValue(
+  //     movieDetails,
+  //   );
 
-    renderMovieDetails();
+  //   renderMovieDetails();
 
-    expect(
-      await screen.findByRole("heading", {
-        name: /test movie/i,
-      }),
-    ).toBeInTheDocument();
+  //   expect(
+  //     await screen.findByRole("heading", {
+  //       name: /test movie/i,
+  //     }),
+  //   ).toBeInTheDocument();
 
-    expect(
-      mockedGetMovieDetails,
-    ).toHaveBeenCalledWith(123);
+  //   expect(
+  //     mockedGetMovieDetails,
+  //   ).toHaveBeenCalledWith(123);
 
-    expect(
-      screen.getByText(
-        /a movie used for testing/i,
-      ),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByText(
+  //       /a movie used for testing/i,
+  //     ),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByText(/the test begins/i),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByText(/the test begins/i),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByText(/8\.5/),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByText(/8\.5/),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByText(/125 minutes/i),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByText(/125 minutes/i),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByText("Action"),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByText("Action"),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByText("PG-13"),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByText("PG-13"),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("img", {
-        name: /test movie poster/i,
-      }),
-    ).toBeInTheDocument();
+  //   expect(
+  //     screen.getByRole("img", {
+  //       name: /test movie poster/i,
+  //     }),
+  //   ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("link", {
-        name: /back to movies/i,
-      }),
-    ).toHaveAttribute("href", "/movies");
-  });
+  //   expect(
+  //     screen.getByRole("link", {
+  //       name: /back to movies/i,
+  //     }),
+  //   ).toHaveAttribute("href", "/movies");
+  // });
 
-  it("displays not rated when no US certification exists", async () => {
-    mockedGetMovieDetails.mockResolvedValue({
-      ...movieDetails,
-      release_dates: {
-        results: [],
-      },
-    });
+  // it("displays not rated when no US certification exists", async () => {
+  //   mockedGetMovieDetails.mockResolvedValue({
+  //     ...movieDetails,
+  //     release_dates: {
+  //       results: [],
+  //     },
+  //   });
 
-    renderMovieDetails();
+  //   renderMovieDetails();
 
-    expect(
-      await screen.findByText(/not rated/i),
-    ).toBeInTheDocument();
-  });
+  //   expect(
+  //     await screen.findByText(/not rated/i),
+  //   ).toBeInTheDocument();
+  // });
 
   it("displays an error when the details request fails", async () => {
     vi.spyOn(

@@ -1,125 +1,54 @@
-import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import SearchForm from "../components/movies/SearchForm";
+import { useMovies } from "../hooks/useMovies";
 import MovieGrid from "../components/movies/MovieGrid";
-import {
-  getPopularMovies,
-  searchMovies,
-} from "../services/tmdbApi";
-import type { Movie } from "../types/movie";
-import { genres } from "../constants/genres";
+import SearchForm from "../components/movies/SearchForm";
+import MovieFilters from "../components/movies/MovieFilters";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorMessage from "../components/common/ErrorMessage";
 
 function MoviesPage() {
-  // Login success message
-  const location = useLocation();
-  const message = location.state?.message;
-
-  // Movie data and UI state
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  // Selected genre for filtering
-  const [selectedGenre, setSelectedGenre] = useState("");
-
-  useEffect(() => {
-    let ignoreResult = false;
-
-    // Load popular movies when the page opens
-    getPopularMovies()
-      .then((results) => {
-        if (!ignoreResult) {
-          setMovies(results);
-        }
-      })
-      .catch((requestError) => {
-        console.error(requestError);
-
-        if (!ignoreResult) {
-          setError("Failed to load popular movies.");
-        }
-      })
-      .finally(() => {
-        if (!ignoreResult) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      ignoreResult = true;
-    };
-  }, []);
-
-  async function handleSearch(searchTerm: string) {
-    setLoading(true);
-    setError("");
-
-    try {
-      const results = searchTerm
-        ? await searchMovies(searchTerm)
-        : await getPopularMovies();
-
-      setMovies(results);
-    } catch (requestError) {
-      console.error(requestError);
-      setMovies([]);
-      setError("Failed to load movies.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // Filter movies by selected genre
-  const filteredMovies = selectedGenre
-    ? movies.filter((movie) =>
-        movie.genre_ids?.includes(Number(selectedGenre))
-      )
-    : movies;
+  const {
+    movies,
+    loading,
+    error,
+    page,
+    totalPages,
+    setPage,
+    search,
+    filterByGenre,
+  } = useMovies();
 
   return (
-    <>
-      {message && (
-        <div
-          className="alert alert-success text-center"
-          role="alert"
+    <div>
+      <h1>Movies</h1>
+
+      <SearchForm onSearch={search} />
+
+      <MovieFilters onFilterChange={filterByGenre} />
+
+      {(() => {
+        if (loading) return <LoadingSpinner />;
+        else if (error) return <ErrorMessage message={error} />;
+        else if (movies.length === 0) return <p>No movies were found.</p>;
+        return <MovieGrid movies={movies} />;
+      })()}
+
+      <div>
+        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+          Previous
+        </button>
+
+        <span>
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages}
         >
-          ✅ {message}
-        </div>
-      )}
-
-      <SearchForm
-        onSearch={handleSearch}
-        genres={genres}
-        selectedGenre={selectedGenre}
-        onGenreChange={setSelectedGenre}
-      />
-
-      {loading && (
-        <p className="text-center">
-          Loading movies...
-        </p>
-      )}
-
-      {error && (
-        <p className="text-center text-danger">
-          {error}
-        </p>
-      )}
-
-      {!loading &&
-        !error &&
-        filteredMovies.length === 0 && (
-          <p className="text-center">
-            No movies were found.
-          </p>
-        )}
-
-      {!loading &&
-        !error &&
-        filteredMovies.length > 0 && (
-          <MovieGrid movies={filteredMovies} />
-        )}
-    </>
+          Next
+        </button>
+      </div>
+    </div>
   );
 }
 

@@ -1,87 +1,50 @@
-import type {
-  Genre,
-  Movie,
-  MovieDetails,
-  TMDBResponse,
-} from "../types/movie";
+import axios from "axios";
+import type { Movie, TMDBResponse, MovieDetails } from "../types/movie";
 
-const API_URL = "https://api.themoviedb.org/3";
-const token = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN;
+const BASE_URL = "https://api.themoviedb.org/3";
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
-async function requestTMDB<T>(
-  endpoint: string,
-): Promise<T> {
-  if (!token) {
-    throw new Error(
-      "The TMDB access token is missing.",
-    );
-  }
+const api = axios.create({
+  baseURL: BASE_URL,
+  params: {
+    api_key: API_KEY,
+  },
+});
 
-  const response = await fetch(
-    `${API_URL}/${endpoint}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accept: "application/json",
-      },
-    },
-  );
+export async function getPopularMovies(page: number = 1): Promise<TMDBResponse> {
+  
+  const response = await api.get<TMDBResponse>("/movie/popular", { params: { page } });
 
-  if (!response.ok) {
-    throw new Error(
-      `TMDB request failed: ${response.status}`,
-    );
-  }
-
-  return response.json() as Promise<T>;
+  return response.data;
 }
 
-export async function getPopularMovies(): Promise<Movie[]> {
-  const data = await requestTMDB<TMDBResponse>(
-    "movie/popular",
-  );
+export async function searchMovies(query: string, page: number = 1): Promise<TMDBResponse> {
+    
+    const response = await api.get<TMDBResponse>("/search/movie", { params: { query, page } });
 
-  return data.results;
+    return response.data;
 }
 
-export async function searchMovies(
-  query: string,
-): Promise<Movie[]> {
-  const encodedQuery = encodeURIComponent(query);
+export async function getMoviesByGenre(genreId: number, page: number = 1): Promise<TMDBResponse> {
 
-  const data = await requestTMDB<TMDBResponse>(
-    `search/movie?query=${encodedQuery}`,
-  );
-
-  return data.results;
+  const response = await api.get<TMDBResponse>("/discover/movie", { params: { with_genres: genreId, page } });
+  
+  return response.data;
 }
 
-export async function getMoviesByGenre(
-  genreId: number,
-): Promise<Movie[]> {
-  const data = await requestTMDB<TMDBResponse>(
-    `discover/movie?with_genres=${genreId}`,
-  );
-
-  return data.results;
+export async function getMovieDetails(id: number): Promise<MovieDetails> {
+  // Line above changed
+  const response = await api.get<MovieDetails>(`/movie/${id}`);
+  
+  return response.data;
 }
 
-export async function getMovieDetails(
-  movieId: number,
-): Promise<MovieDetails> {
-  return requestTMDB<MovieDetails>(
-    `movie/${movieId}?append_to_response=release_dates`,
-  );
+export interface GenreResponse {
+    genres: { id: number; name: string }[];
 }
 
-interface GenreResponse {
-  genres: Genre[];
-}
+export async function getGenres(): Promise<{ id: number; name: string }[]> {
+    const response = await api.get<GenreResponse>("/genre/movie/list");
 
-export async function getGenres(): Promise<Genre[]> {
-  const response = await requestTMDB<GenreResponse>(
-    "genre/movie/list",
-  );
-
-  return response.genres;
+    return response.data.genres;
 }
